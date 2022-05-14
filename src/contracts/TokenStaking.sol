@@ -170,7 +170,7 @@ contract APYStaking is Ownable{
         }
     }
 
-    //dailyAPY60 tokens airdrop
+    //dailyAPY90 tokens airdrop
     function customRewards90() public onlyOwner{
      
         for (uint256 i = 0; i < customStakers.length; i++) {
