@@ -9,40 +9,49 @@ contract APYStaking is Ownable{
     string public name = "APY Staking";
     TechAlchemy public APY;
 
+    uint256 start30;
+    uint256 start60;
+    uint256 start90;
  
     //address public owner;
 
     //declaring 30 days staking for APY (default 0.3% daily i.e. 10% APY in 30 days)
-    uint256 public dailyAPY = 300;
+    uint256 public thirtyAPY = 1000;
 
     //declaring APY for 60 days staking ( default 0.3% daily i.e. 20% APY in 60 days)
-    uint256 public dailyAPY60 = 300;
+    uint256 public sixtyAPY = 2000;
 
-    // //declaring APY for 60 days staking ( default 0.3% daily i.e. 20% APY in 60 days)
-    uint256 public dailyAPY90 = 300;
+    // //declaring APY for 60 days staking ( default 0.3% daily i.e. 30% APY in 90 days)
+    uint256 public APY90 = 3000;
 
     //declaring total staked
     uint256 public totalStaked;
-    uint256 public customTotalStaked;
+    uint256 public customTotalStaked60;
+    uint256 public customTotalStaked90;
 
     //users staking balance
     mapping(address => uint256) public stakingBalance;
-    mapping(address => uint256) public customStakingBalance;
+    mapping(address => uint256) public customStakingBalance60;
+    mapping(address => uint256) public customStakingBalance90;
 
     //mapping list of users who ever staked
     mapping(address => bool) public hasStaked;
-    mapping(address => bool) public customHasStaked;
+    mapping(address => bool) public customHasStaked60;
+    mapping(address => bool) public customHasStaked90;
 
     //mapping list of users who are staking at the moment
     mapping(address => bool) public isStakingAtm;
-    mapping(address => bool) public customIsStakingAtm;
+    mapping(address => bool) public customIsStakingAtm60;
+    mapping(address => bool) public customIsStakingAtm90;
 
     //array of all stakers
     address[] public stakers;
-    address[] public customStakers;
+    address[] public customStakers60;
+    address[] public customStakers90;
 
     constructor(TechAlchemy _APY) public{
         APY = _APY;
+       
     }
 
     //stake tokens function
@@ -50,6 +59,8 @@ contract APYStaking is Ownable{
     function stakeTokens(uint256 _amount) public {
         //must be more than 0
         require(_amount > 0, "amount cannot be 0");
+         
+        start30 = block.timestamp;
 
         //User adding test tokens
         APY.transferFrom(msg.sender, address(this), _amount);
@@ -72,11 +83,13 @@ contract APYStaking is Ownable{
 
     function unstakeTokens() public {
         //get staking balance for user
-
+        //stakeTokens storage start1;
         uint256 balance = stakingBalance[msg.sender];
 
         //amount should be more than 0
         require(balance > 0, "amount has to be more than 0");
+
+       require(block.timestamp >= start30, "Unstaking of tokens can be done only after 30 days");
 
         //transfer staked tokens back to user
         APY.transfer(msg.sender, balance);
@@ -92,51 +105,55 @@ contract APYStaking is Ownable{
     // APY pool for 60 days
     function customStaking60(uint256 _amount) public {
         require(_amount > 0, "amount cannot be 0");
+        start60 = block.timestamp;
         APY.transferFrom(msg.sender, address(this), _amount);
-        customTotalStaked = customTotalStaked + _amount;
-        customStakingBalance[msg.sender] =
-            customStakingBalance[msg.sender] +
+        customTotalStaked60 = customTotalStaked60 + _amount;
+        customStakingBalance60[msg.sender] =
+            customStakingBalance60[msg.sender] +
             _amount;
 
-        if (!customHasStaked[msg.sender]) {
-            customStakers.push(msg.sender);
+        if (!customHasStaked60[msg.sender]) {
+            customStakers60.push(msg.sender);
         }
-        customHasStaked[msg.sender] = true;
-        customIsStakingAtm[msg.sender] = true;
+        customHasStaked60[msg.sender] = true;
+        customIsStakingAtm60[msg.sender] = true;
     }
 
     function customUnstake60() public {
-        uint256 balance = customStakingBalance[msg.sender];
-        require(balance > 0, "amount has to be more than 0");
-        APY.transfer(msg.sender, balance);
-        customTotalStaked = customTotalStaked - balance;
-        customStakingBalance[msg.sender] = 0;
-        customIsStakingAtm[msg.sender] = false;
+        uint256 balance60 = customStakingBalance60[msg.sender];
+        require(balance60 > 0, "amount has to be more than 0");
+        require(block.timestamp >= start60, "Unstaking of tokens can be done only after 60 days");
+        APY.transfer(msg.sender, balance60);
+        customTotalStaked60 = customTotalStaked60 - balance60;
+        customStakingBalance60[msg.sender] = 0;
+        customIsStakingAtm60[msg.sender] = false;
     }
 
     // APY pool for 90 days
     function customStaking90(uint256 _amount) public {
         require(_amount > 0, "amount cannot be 0");
+        start90 = block.timestamp;
         APY.transferFrom(msg.sender, address(this), _amount);
-        customTotalStaked = customTotalStaked + _amount;
-        customStakingBalance[msg.sender] =
-            customStakingBalance[msg.sender] +
+        customTotalStaked90 = customTotalStaked90 + _amount;
+        customStakingBalance90[msg.sender] =
+            customStakingBalance90[msg.sender] +
             _amount;
 
-        if (!customHasStaked[msg.sender]) {
-            customStakers.push(msg.sender);
+        if (!customHasStaked90[msg.sender]) {
+            customStakers90.push(msg.sender);
         }
-        customHasStaked[msg.sender] = true;
-        customIsStakingAtm[msg.sender] = true;
+        customHasStaked90[msg.sender] = true;
+        customIsStakingAtm90[msg.sender] = true;
     }
 
     function customUnstake90() public {
-        uint256 balance = customStakingBalance[msg.sender];
-        require(balance > 0, "amount has to be more than 0");
-        APY.transfer(msg.sender, balance);
-        customTotalStaked = customTotalStaked - balance;
-        customStakingBalance[msg.sender] = 0;
-        customIsStakingAtm[msg.sender] = false;
+        uint256 balance90 = customStakingBalance90[msg.sender];
+        require(balance90 > 0, "amount has to be more than 0");
+        require(block.timestamp >= start90, "Unstaking of tokens can be done only after 90 days");
+        APY.transfer(msg.sender, balance90);
+        customTotalStaked90 = customTotalStaked90 - balance90;
+        customStakingBalance90[msg.sender] = 0;
+        customIsStakingAtm90[msg.sender] = false;
     }
 
     //airdropp tokens
@@ -147,7 +164,7 @@ contract APYStaking is Ownable{
             address recipient = stakers[i];
 
             //calculating daily apy for user
-            uint256 balance = stakingBalance[recipient] * dailyAPY;
+            uint256 balance = stakingBalance[recipient] * thirtyAPY;
             balance = balance / 100000;
 
             if (balance > 0) {
@@ -159,9 +176,9 @@ contract APYStaking is Ownable{
     //dailyAPY60 tokens airdrop
     function customRewards60() public onlyOwner{
      
-        for (uint256 i = 0; i < customStakers.length; i++) {
-            address recipient = customStakers[i];
-            uint256 balance = customStakingBalance[recipient] * dailyAPY60;
+        for (uint256 i = 0; i < customStakers60.length; i++) {
+            address recipient = customStakers60[i];
+            uint256 balance = customStakingBalance60[recipient] * sixtyAPY;
             balance = balance / 100000;
 
             if (balance > 0) {
@@ -170,12 +187,12 @@ contract APYStaking is Ownable{
         }
     }
 
-    //dailyAPY90 tokens airdrop
+    //dailyAPY60 tokens airdrop
     function customRewards90() public onlyOwner{
      
-        for (uint256 i = 0; i < customStakers.length; i++) {
-            address recipient = customStakers[i];
-            uint256 balance = customStakingBalance[recipient] * dailyAPY90;
+        for (uint256 i = 0; i < customStakers90.length; i++) {
+            address recipient = customStakers90[i];
+            uint256 balance = customStakingBalance90[recipient] * APY90;
             balance = balance / 100000;
 
             if (balance > 0) {
@@ -191,7 +208,7 @@ contract APYStaking is Ownable{
             _value > 0,
             "APY value has to be more than 0, try 300 for (0.3% daily) instead"
         );
-        dailyAPY60= _value;
+        sixtyAPY = _value;
     }
 
     //change APY value for 90 days staking
@@ -201,7 +218,7 @@ contract APYStaking is Ownable{
             _value > 0,
             "APY value has to be more than 0, try 300 for (0.3% daily) instead"
         );
-        dailyAPY90 = _value;
+        APY90 = _value;
     }
 
     //cliam test 1000 Tst (for testing purpose only !!)
