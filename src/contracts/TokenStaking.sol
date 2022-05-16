@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./TechAlchemy.sol";
+import "./TestToken.sol";
 
 contract APYStaking is Ownable{
     string public name = "APY Staking";
