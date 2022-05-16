@@ -89,7 +89,7 @@ contract APYStaking is Ownable{
         //amount should be more than 0
         require(balance > 0, "amount has to be more than 0");
 
-       require(block.timestamp >= start30, "Unstaking of tokens can be done only after 30 days");
+       require(block.timestamp >= (start30 + 2592000), "Unstaking of tokens can be done only after 30 days");
 
         //transfer staked tokens back to user
         APY.transfer(msg.sender, balance);
@@ -122,7 +122,7 @@ contract APYStaking is Ownable{
     function customUnstake60() public {
         uint256 balance60 = customStakingBalance60[msg.sender];
         require(balance60 > 0, "amount has to be more than 0");
-        require(block.timestamp >= start60, "Unstaking of tokens can be done only after 60 days");
+        require(block.timestamp >= (start60 + 5184000), "Unstaking of tokens can be done only after 60 days");
         APY.transfer(msg.sender, balance60);
         customTotalStaked60 = customTotalStaked60 - balance60;
         customStakingBalance60[msg.sender] = 0;
@@ -149,7 +149,7 @@ contract APYStaking is Ownable{
     function customUnstake90() public {
         uint256 balance90 = customStakingBalance90[msg.sender];
         require(balance90 > 0, "amount has to be more than 0");
-        require(block.timestamp >= start90, "Unstaking of tokens can be done only after 90 days");
+        require(block.timestamp >= (start90 + 7776000), "Unstaking of tokens can be done only after 90 days");
         APY.transfer(msg.sender, balance90);
         customTotalStaked90 = customTotalStaked90 - balance90;
         customStakingBalance90[msg.sender] = 0;
@@ -187,7 +187,7 @@ contract APYStaking is Ownable{
         }
     }
 
-    //dailyAPY60 tokens airdrop
+    //dailyAPY90 tokens airdrop
     function customRewards90() public onlyOwner{
      
         for (uint256 i = 0; i < customStakers90.length; i++) {
