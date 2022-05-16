@@ -1,3 +1,4 @@
+const Web3 = require("web3");
 require('babel-register');
 require('babel-polyfill');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
@@ -6,14 +7,15 @@ const mnemonic = fs
   .readFileSync('.secret')
   .toString()
   .trim();
-const infuraKey = fs
-  .readFileSync('.infuraKey')
-  .toString()
-  .trim();
 const ethKey = fs
   .readFileSync('.ethKey')
   .toString()
   .trim();
+
+const NODE_URL = "https://speedy-nodes-nyc.moralis.io/414dc4cc304d08be29a106e4/polygon/mumbai/archive";
+const provider = new Web3.providers.HttpProvider(NODE_URL);
+const web3 = new Web3(provider);
+
 
 module.exports = {
   networks: {
@@ -23,31 +25,6 @@ module.exports = {
       network_id: '*', // Match any network id
     },
 
-    //ROPSTEN Test net
-    ropsten: {
-      provider: function() {
-        return new HDWalletProvider(
-          mnemonic,
-          `https://ropsten.infura.io/v3/${infuraKey}`
-        );
-      },
-      network_id: 3,
-      gas: 4500000,
-      gasPrice: 10000000000,
-    },
-
-    //RINKEBY Test net
-    rinkeby: {
-      provider: function() {
-        return new HDWalletProvider(
-          mnemonic,
-          `https://rinkeby.infura.io/v3/${infuraKey}`
-        );
-      },
-      network_id: 4,
-      gas: 4500000,
-      gasPrice: 10000000000,
-    },
   },
 
   contracts_directory: './src/contracts/',
@@ -77,5 +54,4 @@ module.exports = {
 
 // to compile - truffle compile
 // to deploy - truffle migrate --reset
-// to deploy - truffle migrate --network rinkeby --reset
-// to verify - truffle run verify Contract --network rinkeby
+
